@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+#====================HEADER==========================================|
+#AUTOR
+# Jefferson 'Slackjeff' Rocha
+#
+#PROGRAMA
+# SHURL
+#
+#MODO DE USO
+# SHURL é um simples programa que encurta URL's utilizando a API
+# tinyurl.
+# Para conseguir encutar a sua URL você deve seguir no formato:
+# http OU https://www.slackjeff.com.br.
+#
+# EXEMPLO:
+#  shurl https://www.slackjeff.com.br
+#====================================================================|
+
+#=======================VARIAVEIS
+API="http://tinyurl.com/api-create.php?url=" # API tinyurl
+# Cores
+red='\033[31;1m'
+blue='\033[34;1m'
+end='\033[m'
+
+#=======================FUNCOES
+_STATUS()
+{
+	# Verificando status
+	status="$?"
+	[[ $status -eq '1' ]] || [[ $status -eq '252' ]] && exit 0
+}
+
+#=======================TESTES
+
+type -P yad &>/dev/null || { echo "Hey, you need yad for continue."; exit 1 ;}
+
+
+# Capturando Entrada do usuário
+url=$(
+	yad --title='shURL.gtk'   \
+	--center                  \
+	--entry      			  \
+	--entry-label='<b>URL</b>'\
+	--button='Gooo':0    	  \
+	--button='gtk-cancel':1   \
+	--image='iconshurl.png'	  \
+	--back='black'			  \
+	--width='500'             \
+	--height='200'
+)
+_STATUS
+
+msg=' Hey... For Shortener Your URL
+You need pass, Null? Dont work bro.
+'
+# Nulo? Então vaza.
+if [[ -z "$url" ]]; then
+	yad --title 'URL NULL'              \
+	--center                            \
+	--text="$msg"                       \
+	--button=gtk-quit:1                 \
+    --image='iconshurl.png'              \
+	--width='500'                        \
+	--height='200'
+	exit 1
+fi
+
+# Existe http ou https?
+if ! echo "$url" | grep -qoE '^ht{2}ps?:\/\/.*'; then
+	yad --title "Ops!" \
+	--center            \
+	--text-align=center \
+    --image='iconshurl.png'   \
+	--text='Good Format is: http or https://www.example.com' \
+	--button=gtk-quit:1										 \
+	--width=500                                              \
+	--height=200
+fi
+_STATUS
+
+# Encurtando URL e imprimindo
+generate_url=$(curl -s "${API}${url}")
+yad --title="YOUR SHORT URL" 	   \
+	--center					   \
+	--image='iconshurl.png'		   \
+	--button='ok':0				   \
+	--entry						   \
+	--entry-label='<b>Short</b>'   \
+	--entry-text="$generate_url"   \
+	--width=500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
